@@ -9,8 +9,8 @@ const vehicleAnimations = {
   both: null, // handled below
 };
 const licenseAnimations = {
-  professional: 'https://lottie.host/7e2e2e2e-2e2e-2e2e-2e2e-2e2e2e2e2e2e/professional.lottie', // Placeholder
-  nonProfessional: 'https://lottie.host/7e2e2e2e-2e2e-2e2e-2e2e-2e2e2e2e2e2e/nonprofessional.lottie', // Placeholder
+  professional: '/ID Card.json',
+  nonProfessional: '/idcard.json',
 };
 const nidAnimation = 'https://lottie.host/1f475e39-d513-4873-bf23-35482756e476/AKU2kxmFTA.lottie';
 const successAnimation = 'https://lottie.host/2e2e2e2e-2e2e-2e2e-2e2e-2e2e2e2e2e2e/success.lottie'; // Placeholder
@@ -60,36 +60,37 @@ export default function NewApplicationModal({ open, onClose, language = 'en' }) 
                   {language === 'en' ? 'Select Vehicle Type' : 'যানবাহনের ধরন নির্বাচন করুন'}
                 </h2>
                 <div className="flex justify-center gap-6 mb-8">
-                  <button
-                    className={`rounded-xl p-2 border-2 transition-all ${vehicleType === 'motorcycle' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
-                    onClick={() => setVehicleType('motorcycle')}
+                  <div
+                    className={`rounded-xl p-4 border-2 transition-all flex flex-col items-center w-36 h-40 cursor-pointer justify-center ${vehicleType === 'motorcycle' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
+                    onClick={() => { setVehicleType('motorcycle'); setStep(1); }}
                   >
-                    <DotLottieReact src={vehicleAnimations.motorcycle} autoplay loop style={{ width: 80, height: 80 }} />
-                    <div className="mt-2 font-semibold text-sm">{language === 'en' ? 'Motor' : 'মোটর'}</div>
-                  </button>
-                  <button
-                    className={`rounded-xl p-2 border-2 transition-all ${vehicleType === 'car' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
-                    onClick={() => setVehicleType('car')}
-                  >
-                    <DotLottieReact src={vehicleAnimations.car} autoplay loop style={{ width: 80, height: 80 }} />
-                    <div className="mt-2 font-semibold text-sm">{language === 'en' ? 'Light' : 'লাইট'}</div>
-                  </button>
-                  <button
-                    className={`rounded-xl p-2 border-2 transition-all ${vehicleType === 'both' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
-                    onClick={() => setVehicleType('both')}
-                  >
-                    <div className="flex gap-1">
-                      <DotLottieReact src={vehicleAnimations.motorcycle} autoplay loop style={{ width: 38, height: 38 }} />
-                      <DotLottieReact src={vehicleAnimations.car} autoplay loop style={{ width: 38, height: 38 }} />
+                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <DotLottieReact src={vehicleAnimations.motorcycle} autoplay loop style={{ width: 80, height: 80 }} />
                     </div>
-                    <div className="mt-2 font-semibold text-sm">{language === 'en' ? 'Both' : 'উভয়'}</div>
-                  </button>
+                    <div className="mt-2 font-semibold text-sm text-center">{language === 'en' ? 'Motor' : 'মোটর'}</div>
+                  </div>
+                  <div
+                    className={`rounded-xl p-4 border-2 transition-all flex flex-col items-center w-36 h-40 cursor-pointer justify-center ${vehicleType === 'car' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
+                    onClick={() => { setVehicleType('car'); setStep(1); }}
+                  >
+                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <DotLottieReact src={vehicleAnimations.car} autoplay loop style={{ width: 80, height: 80 }} />
+                    </div>
+                    <div className="mt-2 font-semibold text-sm text-center">{language === 'en' ? 'Light' : 'লাইট'}</div>
+                  </div>
+                  <div
+                    className={`rounded-xl p-4 border-2 transition-all flex flex-col items-center w-36 h-40 cursor-pointer justify-center ${vehicleType === 'both' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
+                    onClick={() => { setVehicleType('both'); setStep(1); }}
+                  >
+                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div className="flex gap-1">
+                        <DotLottieReact src={vehicleAnimations.motorcycle} autoplay loop style={{ width: 38, height: 38 }} />
+                        <DotLottieReact src={vehicleAnimations.car} autoplay loop style={{ width: 38, height: 38 }} />
+                      </div>
+                    </div>
+                    <div className="mt-2 font-semibold text-sm text-center">{language === 'en' ? 'Both' : 'উভয়'}</div>
+                  </div>
                 </div>
-                <button
-                  className="w-full py-3 bg-primary text-white rounded-xl font-bold mt-4 disabled:opacity-50"
-                  disabled={!vehicleType}
-                  onClick={() => setStep(1)}
-                >{language === 'en' ? 'Next' : 'পরবর্তী'}</button>
               </motion.div>
             )}
             {/* Step 2: License Type */}
@@ -99,26 +100,25 @@ export default function NewApplicationModal({ open, onClose, language = 'en' }) 
                   {language === 'en' ? 'Select License Type' : 'লাইসেন্সের ধরন নির্বাচন করুন'}
                 </h2>
                 <div className="flex justify-center gap-6 mb-8">
-                  <button
-                    className={`rounded-xl p-2 border-2 transition-all ${licenseType === 'professional' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
-                    onClick={() => setLicenseType('professional')}
+                  <div
+                    className={`rounded-xl p-4 border-2 transition-all flex flex-col items-center w-36 h-40 cursor-pointer justify-center ${licenseType === 'professional' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
+                    onClick={() => { setLicenseType('professional'); setStep(2); }}
                   >
-                    <DotLottieReact src={licenseAnimations.professional} autoplay loop style={{ width: 80, height: 80 }} />
-                    <div className="mt-2 font-semibold text-sm">{language === 'en' ? 'Professional' : 'পেশাদার'}</div>
-                  </button>
-                  <button
-                    className={`rounded-xl p-2 border-2 transition-all ${licenseType === 'nonProfessional' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
-                    onClick={() => setLicenseType('nonProfessional')}
+                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <DotLottieReact src={licenseAnimations.professional} autoplay loop style={{ width: 80, height: 80 }} />
+                    </div>
+                    <div className="mt-2 font-semibold text-sm text-center">{language === 'en' ? 'Professional' : 'পেশাদার'}</div>
+                  </div>
+                  <div
+                    className={`rounded-xl p-4 border-2 transition-all flex flex-col items-center w-36 h-40 cursor-pointer justify-center ${licenseType === 'nonProfessional' ? 'border-primary bg-primary/10' : 'border-gray-200 bg-gray-50'}`}
+                    onClick={() => { setLicenseType('nonProfessional'); setStep(2); }}
                   >
-                    <DotLottieReact src={licenseAnimations.nonProfessional} autoplay loop style={{ width: 80, height: 80 }} />
-                    <div className="mt-2 font-semibold text-sm">{language === 'en' ? 'Non-Professional' : 'অ-পেশাদার'}</div>
-                  </button>
+                    <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <DotLottieReact src={licenseAnimations.nonProfessional} autoplay loop style={{ width: 80, height: 80 }} />
+                    </div>
+                    <div className="mt-2 font-semibold text-sm text-center">{language === 'en' ? 'Non-Professional' : 'অ-পেশাদার'}</div>
+                  </div>
                 </div>
-                <button
-                  className="w-full py-3 bg-primary text-white rounded-xl font-bold mt-4 disabled:opacity-50"
-                  disabled={!licenseType}
-                  onClick={() => setStep(2)}
-                >{language === 'en' ? 'Next' : 'পরবর্তী'}</button>
               </motion.div>
             )}
             {/* Step 3: NID Upload */}
@@ -129,7 +129,11 @@ export default function NewApplicationModal({ open, onClose, language = 'en' }) 
                 </h2>
                 <div className="flex flex-col items-center mb-6">
                   <DotLottieReact src={nidAnimation} autoplay loop style={{ width: 100, height: 100 }} />
-                  <input type="file" accept="image/*" onChange={handleNidUpload} className="mt-4" />
+                  <label htmlFor="nid-upload" className="mt-4 w-full flex flex-col items-center">
+                    <span className="inline-block px-6 py-2 bg-primary text-white rounded-lg font-semibold cursor-pointer hover:bg-primary/80 transition mb-2">Choose File</span>
+                    <input id="nid-upload" type="file" accept="image/*" onChange={handleNidUpload} className="hidden" />
+                    <span className="text-gray-500 text-sm mt-1">{nidImage ? 'File selected' : 'No file chosen'}</span>
+                  </label>
                   {nidImage && (
                     <img src={nidImage} alt="NID Preview" className="mt-4 rounded-xl shadow w-40 h-28 object-cover" />
                   )}

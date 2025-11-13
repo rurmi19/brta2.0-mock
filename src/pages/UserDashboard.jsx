@@ -17,6 +17,7 @@ import {
   Moon,
   Sun,
   Globe,
+  Bell,
 } from 'phosphor-react';
 import { useTheme, useLanguage } from '../contexts/AppContext';
 import { translations } from '../utils/translations';
@@ -28,10 +29,17 @@ const UserDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showNewAppModal, setShowNewAppModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
   const t = translations[language];
+
+  const notifications = [
+    "Welcome to your dashboard!",
+    "Your license renewal is pending.",
+    "Profile updated successfully."
+  ];
 
   const menuItems = [
     { id: 'license', icon: <IdentificationCard size={24} weight="duotone" />, label: t.licenseApplication },
@@ -328,7 +336,39 @@ const UserDashboard = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative">
+            <button
+              className="relative p-2 rounded-full hover:bg-primary/10 transition"
+              onClick={() => setShowNotifications(!showNotifications)}
+              aria-label="Notifications"
+            >
+              <Bell size={24} className="text-primary" />
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">{notifications.length}</span>
+            </button>
+            {showNotifications && (
+              <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg z-50 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center">
+                    <Bell size={20} className="text-primary mr-2" />
+                    <span className="font-bold text-lg">Notifications</span>
+                  </div>
+                  <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
+                    <X size={20} />
+                  </button>
+                </div>
+                <ul className="space-y-2 max-h-60 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <li className="italic text-gray-400">No notifications</li>
+                  ) : (
+                    notifications.map((note, idx) => (
+                      <li key={idx} className="bg-primary/5 rounded px-3 py-2 shadow-sm border border-primary/10 text-gray-800 dark:text-gray-200 text-sm">
+                        {note}
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+            )}
             <ThemeLanguageToggler />
           </div>
         </div>
@@ -388,6 +428,8 @@ const UserDashboard = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Notification Panel removed. Now only the notification bell in the header is used. */}
     </div>
   );
 };

@@ -14,6 +14,8 @@ import {
   Shield,
   Calendar,
   User,
+  Bell,
+  X,
 } from 'phosphor-react';
 import StatCard from '../components/StatCard';
 import { useLanguage } from '../contexts/AppContext';
@@ -26,6 +28,13 @@ const PoliceDashboard = () => {
   const t = translations[language];
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const notifications = [
+    "Incident reported at checkpoint.",
+    "License verification required.",
+    "Patrol schedule updated."
+  ];
 
   const vehicleRecords = [
     {
@@ -129,7 +138,39 @@ const PoliceDashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 relative">
+              <button
+                className="relative p-2 rounded-full hover:bg-primary/10 transition"
+                onClick={() => setShowNotifications(!showNotifications)}
+                aria-label="Notifications"
+              >
+                <Bell size={24} className="text-primary" />
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">{notifications.length}</span>
+              </button>
+              {showNotifications && (
+                <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg z-50 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <Bell size={20} className="text-primary mr-2" />
+                      <span className="font-bold text-lg">Police Notifications</span>
+                    </div>
+                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <ul className="space-y-2 max-h-60 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <li className="italic text-gray-400">No notifications</li>
+                    ) : (
+                      notifications.map((note, idx) => (
+                        <li key={idx} className="bg-primary/5 rounded px-3 py-2 shadow-sm border border-primary/10 text-gray-800 dark:text-gray-200 text-sm">
+                          {note}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              )}
               <ThemeLanguageToggler />
               <motion.button
                 whileHover={{ scale: 1.05 }}

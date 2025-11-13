@@ -1,15 +1,32 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Moon, Sun, Globe } from 'phosphor-react';
+import { Bell } from 'phosphor-react';
+import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import ThemeLanguageToggler from './ThemeLanguageToggler';
 import { useTheme, useLanguage } from '../contexts/AppContext';
 import { translations } from '../utils/translations';
 
 const Navbar = () => {
+  const location = useLocation();
   const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const t = translations[language];
+  const [showPanel, setShowPanel] = useState(false);
+
+  // Determine role based on route
+  let role = null;
+  if (location.pathname.startsWith('/dashboard')) role = 'user';
+  else if (location.pathname.startsWith('/admin')) role = 'admin';
+  else if (location.pathname.startsWith('/police')) role = 'police';
+
+  const notifications = {
+    user: ["Welcome to your dashboard!", "Your license renewal is pending.", "Profile updated successfully."],
+    admin: ["3 new user registrations today.", "System maintenance scheduled for Friday.", "License application flagged for review."],
+    police: ["Incident reported at checkpoint.", "License verification required.", "Patrol schedule updated."]
+  };
 
   return (
     <motion.nav
@@ -59,9 +76,41 @@ const Navbar = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative">
             <ThemeLanguageToggler />
-
+            {/* Notification Bell only on dashboard pages */}
+            {role && (
+              <>
+                <button
+                  className="relative p-2 rounded-full hover:bg-primary/10 transition"
+                  onClick={() => setShowPanel((prev) => !prev)}
+                  aria-label="Notifications"
+                >
+                  <Bell size={28} className="text-primary" />
+                  <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">{notifications[role].length}</span>
+                </button>
+                {/* Notification Dropdown Panel */}
+                {showPanel && (
+                  <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg z-50 p-4">
+                    <div className="flex items-center mb-2">
+                      <Bell size={22} className="text-primary mr-2" />
+                      <span className="font-bold text-lg capitalize">{role} Notifications</span>
+                    </div>
+                    <ul className="space-y-2 max-h-60 overflow-y-auto">
+                      {notifications[role].length === 0 ? (
+                        <li className="italic text-gray-400">No notifications</li>
+                      ) : (
+                        notifications[role].map((note, idx) => (
+                          <li key={idx} className="bg-primary/5 rounded px-3 py-2 shadow-sm border border-primary/10 text-gray-800 dark:text-gray-200">
+                            {note}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </>
+            )}
             {/* Login Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
