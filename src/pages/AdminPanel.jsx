@@ -108,22 +108,22 @@ const AdminPanel = () => {
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">{notifications.length}</span>
               </button>
               {showNotifications && (
-                <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg z-50 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <Bell size={20} className="text-primary mr-2" />
-                      <span className="font-bold text-lg">Admin Notifications</span>
+                <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Bell size={20} className="text-primary dark:text-green-400" />
+                      <span className="font-bold text-lg text-gray-800 dark:text-white">{language === 'en' ? 'Admin Notifications' : 'অ্যাডমিন বিজ্ঞপ্তি'}</span>
                     </div>
-                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                       <X size={20} />
                     </button>
                   </div>
                   <ul className="space-y-2 max-h-60 overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <li className="italic text-gray-400">No notifications</li>
+                      <li className="italic text-gray-400 dark:text-gray-500">{language === 'en' ? 'No notifications' : 'কোনো বিজ্ঞপ্তি নেই'}</li>
                     ) : (
                       notifications.map((note, idx) => (
-                        <li key={idx} className="bg-primary/5 rounded px-3 py-2 shadow-sm border border-primary/10 text-gray-800 dark:text-gray-200 text-sm">
+                        <li key={idx} className="bg-primary/5 dark:bg-primary/10 rounded-lg px-3 py-2 shadow-sm border border-primary/10 dark:border-primary/20 text-gray-800 dark:text-gray-200 text-sm">
                           {note}
                         </li>
                       ))
