@@ -128,8 +128,30 @@ const Homepage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 overflow-hidden">
-        <div className="container mx-auto max-w-7xl">
+      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{ 
+              x: [0, 100, 0],
+              y: [0, -100, 0],
+              scale: [1, 1.2, 1],
+              rotate: [0, 90, 0]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute top-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{ 
+              x: [0, -100, 0],
+              y: [0, 100, 0],
+              scale: [1, 1.5, 1]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-20 left-10 w-96 h-96 bg-green-500/10 rounded-full blur-3xl"
+          />
+        </div>
+        <div className="container mx-auto max-w-7xl relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
             <motion.div
@@ -144,9 +166,26 @@ const Homepage = () => {
                 transition={{ delay: 0.2 }}
                 className="inline-block mb-6"
               >
-                <div className="bg-red-50 dark:bg-red-900/30 text-danger dark:text-red-400 px-6 py-2 rounded-full font-bold text-sm border-2 border-danger/30">
-                  {t.noDalalNoDelay}
-                </div>
+                <motion.div
+                  animate={{ 
+                    boxShadow: [
+                      '0 0 20px rgba(220, 38, 38, 0.3)',
+                      '0 0 40px rgba(220, 38, 38, 0.5)',
+                      '0 0 20px rgba(220, 38, 38, 0.3)'
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 text-danger dark:text-red-400 px-6 py-2 rounded-full font-bold text-sm border-2 border-danger/30 backdrop-blur-sm"
+                >
+                  <span className="flex items-center gap-2">
+                    <motion.span
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="w-2 h-2 bg-danger rounded-full"
+                    />
+                    {t.noDalalNoDelay}
+                  </span>
+                </motion.div>
               </motion.div>
 
               {/* Animated Tagline */}
@@ -201,13 +240,24 @@ const Homepage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.9 }}
-                whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0, 106, 78, 0.3)' }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  boxShadow: '0 20px 60px rgba(0, 106, 78, 0.4)',
+                  y: -5
+                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/signup')}
-                className="group bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl transition-all duration-300 flex items-center gap-3"
+                className="group relative overflow-hidden bg-gradient-to-r from-primary via-green-600 to-primary-dark text-white px-8 py-4 rounded-xl font-bold text-lg shadow-2xl transition-all duration-300 flex items-center gap-3"
               >
-                {t.cta}
+                {/* Animated shine effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+                <span className="relative z-10">{t.cta}</span>
                 <motion.span
+                  className="relative z-10"
                   animate={{ x: [0, 5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
@@ -223,16 +273,33 @@ const Homepage = () => {
               transition={{ duration: 0.8, delay: 0.5 }}
               className="relative flex items-center justify-center lg:justify-end"
             >
-              <div className="w-full max-w-[500px]">
+              {/* Floating decorative elements */}
+              <motion.div
+                animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-10 -left-10 w-32 h-32 bg-gradient-to-br from-primary/20 to-green-500/20 rounded-full blur-2xl"
+              />
+              <motion.div
+                animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-green-500/20 to-primary/20 rounded-full blur-2xl"
+              />
+              
+              <div className="w-full max-w-[500px] relative">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.9, rotateY: -30 }}
+                    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, rotateY: 30 }}
                     transition={{ duration: 1, ease: 'easeInOut' }}
-                    className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-6 shadow-2xl border-2 border-primary/20"
+                    whileHover={{ scale: 1.05, rotateZ: 2 }}
+                    className="relative bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-2xl border-2 border-primary/30 backdrop-blur-sm"
+                    style={{ transformStyle: 'preserve-3d' }}
                   >
+                    {/* Inner glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-green-500/10 rounded-3xl" />
+                    
                     <div className="relative w-full pb-[100%]">
                       <div className="absolute inset-0">
                         <DotLottieReact
@@ -242,6 +309,10 @@ const Homepage = () => {
                         />
                       </div>
                     </div>
+                    
+                    {/* Corner accents */}
+                    <div className="absolute top-4 right-4 w-3 h-3 bg-primary rounded-full animate-pulse" />
+                    <div className="absolute bottom-4 left-4 w-2 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -251,18 +322,31 @@ const Homepage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white/50 dark:bg-gray-800/50 overflow-hidden">
-        <div className="container mx-auto max-w-7xl">
+      <section className="relative py-24 px-4 bg-gradient-to-b from-white via-gray-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900 overflow-hidden">
+        {/* Decorative grid background */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #006A4E 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        
+        <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-800 dark:text-white">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-block mb-4"
+            >
+              <span className="bg-gradient-to-r from-primary to-green-600 text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider">
+                {language === 'en' ? 'Our Services' : 'আমাদের সেবা'}
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 bg-gradient-to-r from-gray-800 via-primary to-gray-800 dark:from-white dark:via-green-400 dark:to-white bg-clip-text text-transparent">
               {t.features}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               {language === 'en' 
                 ? 'Everything you need for seamless vehicle and license management' 
                 : 'নিরবচ্ছিন্ন যানবাহন এবং লাইসেন্স ব্যবস্থাপনার জন্য আপনার প্রয়োজনীয় সবকিছু'}
@@ -283,66 +367,31 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 to-primary-dark/5 dark:from-primary/10 dark:to-primary-dark/10 overflow-hidden">
-        <div className="container mx-auto max-w-7xl">
+      {/* Footer */}
+      <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-12 px-4 border-t border-primary/20">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+        <div className="container mx-auto text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="flex flex-col items-center gap-4"
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-800 dark:text-white">
-              {language === 'en' ? 'Trusted by Thousands' : 'হাজার হাজার মানুষের বিশ্বাস'}
-            </h2>
+            <div className="flex items-center gap-3">
+              <img src="/brta.png" alt="BRTA" className="h-12 w-12 rounded-lg" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
+                BRTA 2.0
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm">
+              © 2025 BRTA 2.0 - {language === 'en' ? 'All Rights Reserved' : 'সর্বস্বত্ব সংরক্ষিত'}
+            </p>
+            <p className="text-gray-500 text-xs max-w-md">
+              {language === 'en' 
+                ? 'Building a transparent, corruption-free digital Bangladesh' 
+                : 'একটি স্বচ্ছ, দুর্নীতিমুক্ত ডিজিটাল বাংলাদেশ গড়ছি'}
+            </p>
           </motion.div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center"
-            >
-              <div className="text-5xl font-extrabold text-primary mb-2">12,450+</div>
-              <div className="text-gray-600 dark:text-gray-400 font-semibold">
-                {language === 'en' ? 'Registered Users' : 'নিবন্ধিত ব্যবহারকারী'}
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center"
-            >
-              <div className="text-5xl font-extrabold text-success mb-2">8,234+</div>
-              <div className="text-gray-600 dark:text-gray-400 font-semibold">
-                {language === 'en' ? 'Vehicles Registered' : 'নিবন্ধিত যানবাহন'}
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center"
-            >
-              <div className="text-5xl font-extrabold text-primary-dark mb-2">99.9%</div>
-              <div className="text-gray-600 dark:text-gray-400 font-semibold">
-                {language === 'en' ? 'Satisfaction Rate' : 'সন্তুষ্টির হার'}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 px-4">
-        <div className="container mx-auto text-center">
-          <p className="text-gray-400">
-            © 2025 BRTA 2.0 - {language === 'en' ? 'All Rights Reserved' : 'সর্বস্বত্ব সংরক্ষিত'}
-          </p>
         </div>
       </footer>
     </div>

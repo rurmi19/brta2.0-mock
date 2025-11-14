@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { ArrowRight } from 'phosphor-react';
 
 const FeatureCard = ({ icon, title, description, delay = 0 }) => {
   return (
@@ -7,18 +8,67 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      whileHover={{ y: -10, scale: 1.02 }}
-      className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+      whileHover={{ y: -12, scale: 1.03 }}
+      className="group relative bg-gradient-to-br from-white via-white to-gray-50/50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900/50 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-primary/30 dark:hover:border-primary/50 overflow-hidden cursor-pointer"
     >
+      {/* Animated background gradient on hover */}
       <motion.div
-        whileHover={{ rotate: 360, scale: 1.2 }}
-        transition={{ duration: 0.6 }}
-        className="w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center mb-4 shadow-md"
-      >
-        <div className="text-white text-3xl">{icon}</div>
-      </motion.div>
-      <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-300">{description}</p>
+        className="absolute inset-0 bg-gradient-to-br from-primary/5 via-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      />
+      
+      {/* Corner accent */}
+      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <div className="relative z-10">
+        {/* Icon Container */}
+        <motion.div
+          whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+          transition={{ duration: 0.5 }}
+          className="relative w-20 h-20 bg-gradient-to-br from-primary via-green-600 to-primary-dark rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-2xl group-hover:shadow-primary/30 transition-all duration-300"
+        >
+          {/* Inner glow */}
+          <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="text-white text-3xl relative z-10">{icon}</div>
+          
+          {/* Floating particle effect */}
+          <motion.div
+            className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"
+            animate={{ 
+              scale: [1, 1.5, 1],
+              opacity: [1, 0.5, 1]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        </motion.div>
+
+        {/* Content */}
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3 group-hover:text-primary dark:group-hover:text-green-400 transition-colors duration-300">
+          {title}
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+          {description}
+        </p>
+        
+        {/* Hover arrow indicator */}
+        <motion.div
+          className="flex items-center gap-2 text-primary dark:text-green-400 font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          initial={{ x: -10 }}
+          whileHover={{ x: 0 }}
+        >
+          <span>Learn more</span>
+          <motion.div
+            animate={{ x: [0, 5, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <ArrowRight size={16} weight="bold" />
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Shine effect on hover */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"
+      />
     </motion.div>
   );
 };

@@ -67,12 +67,24 @@ const AdminPanel = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-light via-white to-muted dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{ 
+            rotate: [0, 360],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute top-20 right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+        />
+      </div>
+
       {/* Header */}
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md sticky top-0 z-50"
+        className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-gray-200/50 dark:border-gray-700/50"
       >
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
