@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 
 const ThemeContext = createContext();
 const LanguageContext = createContext();
@@ -22,10 +22,12 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDark]);
 
-  const toggleTheme = () => setIsDark(!isDark);
+  const toggleTheme = useCallback(() => setIsDark(prev => !prev), []);
+
+  const themeValue = useMemo(() => ({ isDark, toggleTheme }), [isDark, toggleTheme]);
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={themeValue}>
       {children}
     </ThemeContext.Provider>
   );
@@ -36,15 +38,18 @@ export const LanguageProvider = ({ children }) => {
     const saved = localStorage.getItem('language');
     return saved || 'en';
   });
+  const toggleLanguage = useCallback(() => {
+    setLanguage(prev => {
+      const newLang = prev === 'en' ? 'bn' : 'en';
+      localStorage.setItem('language', newLang);
+      return newLang;
+    });
+  }, []);
 
-  const toggleLanguage = () => {
-    const newLang = language === 'en' ? 'bn' : 'en';
-    setLanguage(newLang);
-    localStorage.setItem('language', newLang);
-  };
+  const languageValue = useMemo(() => ({ language, toggleLanguage }), [language, toggleLanguage]);
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage }}>
+    <LanguageContext.Provider value={languageValue}>
       {children}
     </LanguageContext.Provider>
   );

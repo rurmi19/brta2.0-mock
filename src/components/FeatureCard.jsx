@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'phosphor-react';
 
@@ -16,8 +17,7 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => {
         className="absolute inset-0 bg-gradient-to-br from-primary/5 via-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       />
       
-      {/* Corner accent */}
-      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Corner decorative accents removed from feature card */}
       
       <div className="relative z-10">
         {/* Icon Container */}
@@ -30,15 +30,7 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => {
           <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="text-white text-3xl relative z-10">{icon}</div>
           
-          {/* Floating particle effect */}
-          <motion.div
-            className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"
-            animate={{ 
-              scale: [1, 1.5, 1],
-              opacity: [1, 0.5, 1]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
+            {/* Floating particle removed to simplify visuals */}
         </motion.div>
 
         {/* Content */}
@@ -73,4 +65,5 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => {
   );
 };
 
-export default FeatureCard;
+// Memoize to avoid unnecessary re-renders when props are unchanged
+export default React.memo(FeatureCard);

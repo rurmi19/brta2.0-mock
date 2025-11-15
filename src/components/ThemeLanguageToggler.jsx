@@ -1,7 +1,8 @@
+import React from 'react';
 import { Sun, Moon, Globe } from 'phosphor-react';
 import { useTheme, useLanguage } from '../contexts/AppContext';
 
-export default function ThemeLanguageToggler() {
+function ThemeLanguageToggler() {
   const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
 
@@ -37,4 +38,7 @@ export default function ThemeLanguageToggler() {
       </button>
     </div>
   );
+
 }
+
+export default React.memo(ThemeLanguageToggler);

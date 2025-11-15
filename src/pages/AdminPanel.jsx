@@ -1,32 +1,47 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, Routes, Route, NavLink } from 'react-router-dom';
 import {
-  Users,
-  IdentificationCard,
-  Car,
-  ChartLine,
   CheckCircle,
-  XCircle,
-  Clock,
   CalendarBlank,
-  TrendUp,
   SignOut,
-  House,
   Bell,
   X,
+  List,
+  ChartLine,
 } from 'phosphor-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import StatCard from '../components/StatCard';
-import { useLanguage } from '../contexts/AppContext';
+import { useLanguage, useTheme } from '../contexts/AppContext';
 import { translations } from '../utils/translations';
 import ThemeLanguageToggler from '../components/ThemeLanguageToggler';
+import AdminOverview from './admin/AdminOverview';
+import AdminApplications from './admin/AdminApplications';
+import AdminSlots from './admin/AdminSlots';
 
 const AdminPanel = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { isDark } = useTheme();
   const t = translations[language];
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const menuItems = [
+    { 
+      path: '/admin/overview', 
+      label: language === 'en' ? 'Overview' : 'সংক্ষিপ্ত বিবরণ',
+      icon: ChartLine 
+    },
+    { 
+      path: '/admin/applications', 
+      label: language === 'en' ? 'Applications' : 'আবেদনপত্র',
+      icon: CheckCircle 
+    },
+    { 
+      path: '/admin/slots', 
+      label: language === 'en' ? 'Test Slots' : 'পরীক্ষার স্লট',
+      icon: CalendarBlank 
+    },
+  ];
 
   const notifications = [
     "3 new user registrations today.",
@@ -87,18 +102,22 @@ const AdminPanel = () => {
         className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-gray-200/50 dark:border-gray-700/50"
       >
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <img src="/brta.png" alt="BRTA Logo" className="h-12 w-12" />
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                aria-label="Toggle Menu"
+              >
+                <List size={24} className="text-primary dark:text-green-400" />
+              </button>
+              <img src="/brta.png" alt="BRTA Logo" className="h-10 w-10" />
               <div>
-                <h1 className="text-2xl font-bold text-primary dark:text-green-400">BRTA 2.0 - {t.adminPanel}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {language === 'en' ? 'Administrative Dashboard' : 'প্রশাসনিক ড্যাশবোর্ড'}
-                </p>
+                <h1 className="text-xl font-bold text-primary dark:text-green-400">BRTA 2.0 - {t.adminPanel}</h1>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 relative">
+            <div className="flex items-center gap-3">
               <button
                 className="relative p-2 rounded-full hover:bg-primary/10 transition"
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -107,266 +126,111 @@ const AdminPanel = () => {
                 <Bell size={24} className="text-primary" />
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">{notifications.length}</span>
               </button>
-              {showNotifications && (
-                <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Bell size={20} className="text-primary dark:text-green-400" />
-                      <span className="font-bold text-lg text-gray-800 dark:text-white">{language === 'en' ? 'Admin Notifications' : 'অ্যাডমিন বিজ্ঞপ্তি'}</span>
-                    </div>
-                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                      <X size={20} />
-                    </button>
-                  </div>
-                  <ul className="space-y-2 max-h-60 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <li className="italic text-gray-400 dark:text-gray-500">{language === 'en' ? 'No notifications' : 'কোনো বিজ্ঞপ্তি নেই'}</li>
-                    ) : (
-                      notifications.map((note, idx) => (
-                        <li key={idx} className="bg-primary/5 dark:bg-primary/10 rounded-lg px-3 py-2 shadow-sm border border-primary/10 dark:border-primary/20 text-gray-800 dark:text-gray-200 text-sm">
-                          {note}
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                </div>
-              )}
               <ThemeLanguageToggler />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/')}
-                className="flex items-center gap-2 px-4 py-2 text-danger hover:bg-danger/10 rounded-lg transition-colors font-semibold"
-              >
-                <SignOut size={20} weight="bold" />
-                {t.logout}
-              </motion.button>
             </div>
           </div>
         </div>
+
+        {/* Notifications Dropdown */}
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute right-6 top-20 w-80 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 p-4"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Bell size={20} className="text-primary dark:text-green-400" />
+                  <span className="font-bold text-lg text-gray-800 dark:text-white">{language === 'en' ? 'Admin Notifications' : 'অ্যাডমিন বিজ্ঞপ্তি'}</span>
+                </div>
+                <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                  <X size={20} />
+                </button>
+              </div>
+              <ul className="space-y-2 max-h-60 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <li className="italic text-gray-400 dark:text-gray-500">{language === 'en' ? 'No notifications' : 'কোনো বিজ্ঞপ্তি নেই'}</li>
+                ) : (
+                  notifications.map((note, idx) => (
+                    <li key={idx} className="bg-primary/5 dark:bg-primary/10 rounded-lg px-3 py-2 shadow-sm border border-primary/10 dark:border-primary/20 text-gray-800 dark:text-gray-200 text-sm">
+                      {note}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.header>
 
-      <div className="container mx-auto px-6 py-8">
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            icon={<Users size={48} weight="duotone" />}
-            title={t.totalUsers}
-            value="12,450"
-            color="primary"
-            trend={15}
-          />
-          <StatCard
-            icon={<IdentificationCard size={48} weight="duotone" />}
-            title={t.dlRequests}
-            value="856"
-            color="warning"
-            trend={8}
-          />
-          <StatCard
-            icon={<Car size={48} weight="duotone" />}
-            title={t.vehiclesRegistered}
-            value="8,234"
-            color="success"
-            trend={12}
-          />
-          <StatCard
-            icon={<ChartLine size={48} weight="duotone" />}
-            title={language === 'en' ? 'Monthly Revenue' : 'মাসিক আয়'}
-            value="৳ 2.5M"
-            color="info"
-            trend={20}
-          />
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid lg:grid-cols-2 gap-6 mb-8">
-          {/* Monthly Applications Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
-          >
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-              {language === 'en' ? 'Monthly Applications' : 'মাসিক আবেদন'}
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E9ECEF" />
-                <XAxis dataKey="month" stroke="#6C757D" />
-                <YAxis stroke="#6C757D" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#fff',
-                    border: '1px solid #E9ECEF',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Bar dataKey="applications" fill="#006A4E" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="approved" fill="#28A745" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="rejected" fill="#DC3545" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </motion.div>
-
-          {/* Test Center Distribution */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
-          >
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-              {language === 'en' ? 'Test Center Rush Distribution' : 'পরীক্ষা কেন্দ্র রাশ বিতরণ'}
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={testCenterData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {testCenterData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </motion.div>
-        </div>
-
-        {/* Pending Applications */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8"
-        >
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-            {language === 'en' ? 'Pending Applications' : 'মুলতুবি আবেদন'}
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {language === 'en' ? 'Application No' : 'আবেদন নং'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {language === 'en' ? 'Applicant Name' : 'আবেদনকারীর নাম'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {language === 'en' ? 'Type' : 'ধরন'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {language === 'en' ? 'Date' : 'তারিখ'}
-                  </th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {language === 'en' ? 'Actions' : 'কার্যক্রম'}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingApplications.map((app) => (
-                  <tr key={app.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <td className="px-6 py-4 text-gray-800 dark:text-white font-semibold">{app.applicationNo}</td>
-                    <td className="px-6 py-4 text-gray-800 dark:text-white">{app.name}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{app.type}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{app.date}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-center gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="p-2 bg-success/20 text-success rounded-lg hover:bg-success hover:text-white transition-colors"
-                          title={language === 'en' ? 'Approve' : 'অনুমোদন'}
-                        >
-                          <CheckCircle size={20} weight="bold" />
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="p-2 bg-danger/20 text-danger rounded-lg hover:bg-danger hover:text-white transition-colors"
-                          title={language === 'en' ? 'Reject' : 'প্রত্যাখ্যান'}
-                        >
-                          <XCircle size={20} weight="bold" />
-                        </motion.button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
-
-        {/* Test Slot Management */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white">{t.manageSlots}</h3>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 bg-primary text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+      <div className="flex">
+        {/* Sidebar */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.aside
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed left-0 top-[calc(4rem+1px)] h-[calc(100vh-4rem-1px)] w-64 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-2xl border-r-2 border-gray-200/50 dark:border-gray-700/50 z-40 overflow-y-auto"
             >
-              {language === 'en' ? '+ Add New Slot' : '+ নতুন স্লট যোগ করুন'}
-            </motion.button>
+              <nav className="p-4 space-y-2">
+                {menuItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all group ${
+                        isActive
+                          ? 'bg-gradient-to-r from-primary to-green-600 text-white shadow-lg'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20'
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <item.icon 
+                          size={24} 
+                          weight={isActive ? "fill" : "regular"}
+                          className={isActive ? "text-white" : "text-primary dark:text-green-400 group-hover:text-primary dark:group-hover:text-green-400"}
+                        />
+                        <span>{item.label}</span>
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </nav>
+
+              {/* Logout Button */}
+              <div className="absolute bottom-6 left-4 right-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/')}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-danger hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl font-semibold transition-all"
+                >
+                  <SignOut size={24} weight="bold" />
+                  {t.logout}
+                </motion.button>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+          <div className="container mx-auto px-6 py-8">
+            {/* Sub-pages Content */}
+            <Routes>
+              <Route path="/overview" element={<AdminOverview />} />
+              <Route path="/applications" element={<AdminApplications />} />
+              <Route path="/slots" element={<AdminSlots />} />
+              <Route path="/" element={<AdminOverview />} />
+            </Routes>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {testSlots.map((slot) => (
-              <motion.div
-                key={slot.id}
-                whileHover={{ y: -5 }}
-                className="bg-gradient-to-br from-primary/10 to-primary-dark/10 dark:from-primary/20 dark:to-primary-dark/20 p-6 rounded-xl border-2 border-primary/20"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h4 className="font-bold text-gray-800 dark:text-white mb-1">{slot.center}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{slot.date}</p>
-                  </div>
-                  <CalendarBlank size={32} weight="duotone" className="text-primary" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'Total Slots:' : 'মোট স্লট:'}
-                    </span>
-                    <span className="font-semibold text-gray-800 dark:text-white">{slot.slots}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'Booked:' : 'বুক করা হয়েছে:'}
-                    </span>
-                    <span className="font-semibold text-yellow-600">{slot.booked}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'Available:' : 'উপলব্ধ:'}
-                    </span>
-                    <span className="font-semibold text-success">{slot.available}</span>
-                  </div>
-                </div>
-                <div className="mt-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-primary rounded-full h-2 transition-all"
-                    style={{ width: `${(slot.booked / slot.slots) * 100}%` }}
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Moon, Sun, Globe } from 'phosphor-react';
 import { Bell } from 'phosphor-react';
 import { useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import ThemeLanguageToggler from './ThemeLanguageToggler';
 import { useTheme, useLanguage } from '../contexts/AppContext';
 import { translations } from '../utils/translations';
@@ -127,4 +127,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

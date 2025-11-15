@@ -312,7 +312,7 @@ const Homepage = () => {
                     
                     {/* Corner accents */}
                     <div className="absolute top-4 right-4 w-3 h-3 bg-primary rounded-full animate-pulse" />
-                    <div className="absolute bottom-4 left-4 w-2 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+                    <div className="absolute bottom-4 left-4 w-3 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
                   </motion.div>
                 </AnimatePresence>
               </div>

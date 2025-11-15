@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
@@ -50,12 +50,12 @@ const UserDashboard = () => {
   ];
 
   // Function to generate QR code placeholder (will be replaced with actual QR in production)
-  const generateQRCode = (data) => {
+  const generateQRCode = useCallback((data) => {
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`;
-  };
+  }, []);
 
   // Function to open tax token as PDF in new tab
-  const downloadTaxTokenAsPDF = (tokenData) => {
+  const downloadTaxTokenAsPDF = useCallback((tokenData) => {
     const qrUrl = generateQRCode(JSON.stringify(tokenData));
     
     const htmlContent = `
@@ -315,10 +315,10 @@ const UserDashboard = () => {
       newWindow.document.write(htmlContent);
       newWindow.document.close();
     }
-  };
+  }, [generateQRCode]);
 
   // Function to open card as PDF in new tab
-  const downloadCardAsPDF = (cardType, cardData, backData = null, gradientColors = '#006A4E, #28A745, #006A4E', backGradient = '#004A35, #1D7A3A, #004A35') => {
+  const downloadCardAsPDF = useCallback((cardType, cardData, backData = null, gradientColors = '#006A4E, #28A745, #006A4E', backGradient = '#004A35, #1D7A3A, #004A35') => {
     const qrUrl = generateQRCode(JSON.stringify(cardData));
     const backQrUrl = backData ? generateQRCode(JSON.stringify(backData)) : qrUrl;
     
@@ -761,7 +761,37 @@ const UserDashboard = () => {
       newWindow.document.write(htmlContent);
       newWindow.document.close();
     }
-  };
+  }, [generateQRCode]);
+
+  // Handlers optimized to avoid creating new inline functions inside lists
+  const handleToggleVehicleFlip = useCallback((e) => {
+    const id = e.currentTarget.dataset.vid;
+    if (!id) return;
+    setFlippedVehicles(prev => ({ ...prev, [id]: !prev[id] }));
+  }, []);
+
+  const handleDownloadCard = useCallback((e) => {
+    const d = e.currentTarget.dataset;
+    const plate = d.plate;
+    const model = d.model;
+    const year = d.year;
+    const id = d.vid;
+    const status = d.status;
+    const name = `Vehicle_Smart_Card_${plate}`;
+    downloadCardAsPDF(name, {
+      'Vehicle Model': model,
+      'Registration Plate': plate,
+      'Year': year,
+      'Owner': 'John Doe',
+      'Card No': `VC-${parseInt(id, 10).toString().padStart(6, '0')}`,
+      'Status': status
+    });
+  }, [downloadCardAsPDF]);
+
+  const handleShowTaxToken = useCallback((e) => {
+    const id = e.currentTarget.dataset.vid;
+    setShowTaxToken(id ? parseInt(id, 10) : null);
+  }, []);
 
   const menuItems = [
     { id: 'license', icon: <IdentificationCard size={24} weight="duotone" />, label: t.licenseApplication },
@@ -1268,25 +1298,24 @@ const UserDashboard = () => {
                             <p className="text-xs opacity-80 mb-3">{language === 'en' ? 'Issued:' : 'ইস্যু:'} 10/03/{vehicle.year}</p>
                             <div className="flex gap-2 mb-2">
                               <motion.button
+                                data-vid={vehicle.id}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => setFlippedVehicles(prev => ({ ...prev, [vehicle.id]: !prev[vehicle.id] }))}
+                                onClick={handleToggleVehicleFlip}
                                 className="flex-1 px-3 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-semibold text-sm flex items-center justify-center gap-1.5"
                               >
                                 <ArrowsClockwise size={16} />
                                 {language === 'en' ? 'Flip' : 'উল্টান'}
                               </motion.button>
                               <motion.button
+                                data-vid={vehicle.id}
+                                data-plate={vehicle.plate}
+                                data-model={vehicle.model}
+                                data-year={vehicle.year}
+                                data-status={vehicle.status}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => downloadCardAsPDF(`Vehicle_Smart_Card_${vehicle.plate}`, {
-                                  'Vehicle Model': vehicle.model,
-                                  'Registration Plate': vehicle.plate,
-                                  'Year': vehicle.year,
-                                  'Owner': 'John Doe',
-                                  'Card No': `VC-${vehicle.id.toString().padStart(6, '0')}`,
-                                  'Status': vehicle.status
-                                })}
+                                onClick={handleDownloadCard}
                                 className="flex-1 px-3 py-2 bg-white text-blue-600 hover:bg-white/90 rounded-lg font-semibold text-sm flex items-center justify-center gap-1.5"
                               >
                                 <DownloadSimple size={16} />
@@ -1294,9 +1323,10 @@ const UserDashboard = () => {
                               </motion.button>
                             </div>
                             <motion.button
+                              data-vid={vehicle.id}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => setShowTaxToken(vehicle.id)}
+                              onClick={handleShowTaxToken}
                               className="w-full px-3 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-semibold text-sm flex items-center justify-center gap-1.5"
                             >
                               <CreditCard size={16} />
@@ -1517,18 +1547,6 @@ const UserDashboard = () => {
                 </div>
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-4 py-2 bg-primary text-white rounded-lg font-semibold shadow-md">{language === 'en' ? 'Change' : 'পরিবর্তন'}</motion.button>
               </div>
-              {/* Sign Out */}
-              <div className="flex justify-end pt-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/')}
-                  className="flex items-center gap-2 px-6 py-3 text-danger bg-danger/10 hover:bg-danger/20 rounded-xl font-bold text-lg shadow-lg transition-all"
-                >
-                  <SignOut size={24} weight="bold" />
-                  {t.logout}
-                </motion.button>
-              </div>
             </div>
           </div>
         );
@@ -1586,7 +1604,7 @@ const UserDashboard = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 relative">
+          <div className="flex items-center gap-3">
             <button
               className="relative p-2 rounded-full hover:bg-primary/10 transition"
               onClick={() => setShowNotifications(!showNotifications)}
@@ -1595,33 +1613,42 @@ const UserDashboard = () => {
               <Bell size={24} className="text-primary" />
               <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">{notifications.length}</span>
             </button>
-            {showNotifications && (
-              <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Bell size={20} className="text-primary dark:text-green-400" />
-                    <span className="font-bold text-lg text-gray-800 dark:text-white">{language === 'en' ? 'Notifications' : 'বিজ্ঞপ্তি'}</span>
-                  </div>
-                  <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                    <X size={20} />
-                  </button>
-                </div>
-                <ul className="space-y-2 max-h-60 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <li className="italic text-gray-400 dark:text-gray-500">{language === 'en' ? 'No notifications' : 'কোনো বিজ্ঞপ্তি নেই'}</li>
-                  ) : (
-                    notifications.map((note, idx) => (
-                      <li key={idx} className="bg-primary/5 dark:bg-primary/10 rounded-lg px-3 py-2 shadow-sm border border-primary/10 dark:border-primary/20 text-gray-800 dark:text-gray-200 text-sm">
-                        {note}
-                      </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-            )}
             <ThemeLanguageToggler />
           </div>
         </div>
+
+        {/* Notifications Dropdown */}
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute right-6 top-20 w-80 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 p-4"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Bell size={20} className="text-primary dark:text-green-400" />
+                  <span className="font-bold text-lg text-gray-800 dark:text-white">{language === 'en' ? 'Notifications' : 'বিজ্ঞপ্তি'}</span>
+                </div>
+                <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                  <X size={20} />
+                </button>
+              </div>
+              <ul className="space-y-2 max-h-60 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <li className="italic text-gray-400 dark:text-gray-500">{language === 'en' ? 'No notifications' : 'কোনো বিজ্ঞপ্তি নেই'}</li>
+                ) : (
+                  notifications.map((note, idx) => (
+                    <li key={idx} className="bg-primary/5 dark:bg-primary/10 rounded-lg px-3 py-2 shadow-sm border border-primary/10 dark:border-primary/20 text-gray-800 dark:text-gray-200 text-sm">
+                      {note}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.header>
 
       <div className="flex pt-20">
@@ -1651,6 +1678,19 @@ const UserDashboard = () => {
                   </motion.button>
                 ))}
               </nav>
+
+              {/* Logout Button */}
+              <div className="absolute bottom-6 left-6 right-6">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/')}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-danger hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl font-semibold transition-all"
+                >
+                  <SignOut size={24} weight="bold" />
+                  {t.logout}
+                </motion.button>
+              </div>
             </motion.aside>
           )}
         </AnimatePresence>

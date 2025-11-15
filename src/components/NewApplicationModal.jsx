@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { translations } from '../utils/translations';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
@@ -15,7 +15,7 @@ const licenseAnimations = {
 const nidAnimation = 'https://lottie.host/1f475e39-d513-4873-bf23-35482756e476/AKU2kxmFTA.lottie';
 const successAnimation = 'https://lottie.host/2e2e2e2e-2e2e-2e2e-2e2e-2e2e2e2e2e2e/success.lottie'; // Placeholder
 
-export default function NewApplicationModal({ open, onClose, language = 'en' }) {
+function NewApplicationModal({ open, onClose, language = 'en' }) {
     const t = translations[language];
   const [step, setStep] = useState(0);
   const [vehicleType, setVehicleType] = useState(null);
@@ -167,3 +167,5 @@ export default function NewApplicationModal({ open, onClose, language = 'en' }) 
     </AnimatePresence>
   );
 }
+
+export default React.memo(NewApplicationModal);
